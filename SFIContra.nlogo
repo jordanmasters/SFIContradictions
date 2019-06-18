@@ -17,7 +17,7 @@ breed [allcs allc]
 breed [allds alld]
 breed [rcs rc]
 
-globals [groupxys ordered-groups ordered-groups-set types popular-vote global-vote groups-positions]
+globals [groupxys ordered-groups ordered-groups-set types popular-vote global-vote global-vote-weighted groups-positions groups-positions-weighted consensus consensus-weighted]
 
 
 to setup
@@ -25,6 +25,21 @@ to setup
   make-groups
   decentralized-heirarchical-split ;; hardcode this so we done need to see it in the interface
   populate-groups
+
+  ;; put this in a function ....
+  set consensus []
+  set consensus-weighted []
+  set groups-positions-weighted []
+  set global-vote-weighted []
+  let p-len range percieved-consensus-len
+  foreach p-len
+  [ fake-consent -> set consensus fput (random-float 2 - 1) consensus;show (word x " -> " round x)
+    ;sum [my-position] of turtles with [mygroup = group-num]
+  ]
+  ;show consensus
+
+
+
   reset-ticks
 end
 
@@ -55,13 +70,40 @@ to calc-group-vote
   set groups-positions []
   let m rows * columns
   let m-list range m
+  let con-len length consensus
+  let con-len-back length consensus - percieved-consensus-len
   foreach m-list
-  [ group-num -> set groups-positions [my-position] of turtles with [mygroup = group-num];show (word x " -> " round x)
+  [ group-num -> set groups-positions ([my-position] of turtles with [mygroup = group-num]) ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
     ;sum [my-position] of turtles with [mygroup = group-num]
   ]
+  show "group pos"
   show groups-positions
-  set global-vote sum groups-positions / m
+;  set groups-positions map [ ? / 100 ] groups-positions
 
+  set groups-positions-weighted []
+  foreach groups-positions
+  [
+  mypos ->
+;    show "mypos"
+;    show mypos
+;    show "self-weight"
+;    show self-weight
+;    show "mypos * self-weight"
+;    show mypos * self-weight
+;    show "sum sublist consensus con-len-back con-len"
+;    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back))
+;    show "globalpos * 1 - self-weight"
+    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)
+    set groups-positions-weighted fput ((mypos * self-weight) + (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)) groups-positions-weighted
+  ]
+  show "group pos weighted"
+  show groups-positions-weighted
+
+  set global-vote sum groups-positions / m
+  set consensus fput global-vote consensus
+
+  set global-vote-weighted sum groups-positions-weighted / m
+  set consensus-weighted fput global-vote-weighted consensus-weighted
 
   ;set my-list fput something my-list
 end
@@ -80,7 +122,7 @@ to die-birth
         set my-position random-float 2 - 1
         set vote-prob 1 / sqrt group-count
         if my-position > 0 [set color yellow]
-        if my-position < 0 [set color blue]
+        if my-position < 0 [set color sky]
         ;; this is the hackiest single band-aid which should do fine for the amount of batch runs we are trying to do, but perhaps put one more level of manual recursion to force it if its an issue.
         if my-position = 0 [set my-position random-float 2 - 1 ]
       ]
@@ -173,7 +215,7 @@ to populate-group [radius n x_cors y_cors mygr]
     set vote-prob 1 / sqrt group-count
 
     if my-position > 0 [set color yellow]
-    if my-position < 0 [set color blue]
+    if my-position < 0 [set color sky]
     ;; this is the hackiest single band-aid which should do fine for the amount of batch runs we are trying to do, but perhaps put one more level of manual recursion to force it if its an issue.
     if my-position = 0 [set my-position random-float 2 - 1 ]
 
@@ -225,10 +267,10 @@ end
 ;end
 @#$#@#$#@
 GRAPHICS-WINDOW
-627
-12
-1283
-669
+333
+10
+989
+667
 -1
 -1
 19.64
@@ -252,10 +294,10 @@ ticks
 30.0
 
 SLIDER
-316
-160
-417
-193
+14
+373
+115
+406
 rows
 rows
 1
@@ -267,10 +309,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-421
-160
-539
-193
+119
+373
+237
+406
 columns
 columns
 1
@@ -299,10 +341,10 @@ NIL
 1
 
 BUTTON
-458
-75
-521
-108
+161
+84
+224
+117
 NIL
 go
 T
@@ -316,10 +358,10 @@ NIL
 1
 
 BUTTON
-524
-75
-605
-108
+227
+84
+308
+117
 go once
 go
 NIL
@@ -384,10 +426,10 @@ NIL
 1
 
 SLIDER
-317
-205
-495
-238
+15
+418
+193
+451
 percent-acephalous
 percent-acephalous
 0
@@ -416,30 +458,30 @@ NIL
 1
 
 SLIDER
-317
-245
-438
-278
+15
+458
+136
+491
 group-count
 group-count
 1
 30
-15.0
+12.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-444
-245
-565
-278
+142
+458
+263
+491
 group-radius
 group-radius
 0.5
 3
-1.0
+1.5
 0.5
 1
 NIL
@@ -528,8 +570,8 @@ SLIDER
 percieved-consensus-len
 percieved-consensus-len
 5
-100
-11.0
+30
+5.0
 5
 1
 NIL
@@ -544,7 +586,7 @@ self-weight
 self-weight
 0.01
 1
-0.5
+0.97
 0.01
 1
 NIL
@@ -559,17 +601,17 @@ prob-die
 prob-die
 0
 1
-0.5
+0.96
 0.01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1315
-52
-1515
-202
+1021
+50
+1221
+200
 Popular Vote
 NIL
 NIL
@@ -584,10 +626,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot popular-vote"
 
 MONITOR
-1520
-47
-1615
-92
+1236
+51
+1331
+96
 NIL
 popular-vote
 17
@@ -595,10 +637,10 @@ popular-vote
 11
 
 PLOT
-1320
-258
-1520
-408
+1026
+256
+1226
+406
 Global Vote
 NIL
 NIL
@@ -611,6 +653,53 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot global-vote"
+
+PLOT
+1028
+437
+1228
+587
+Global vs Popular Vote Diff
+NIL
+NIL
+0.0
+10.0
+-1.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot global-vote - popular-vote"
+
+PLOT
+1250
+251
+1450
+401
+global-vote-weighted
+NIL
+NIL
+0.0
+10.0
+-1.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot global-vote-weighted"
+
+MONITOR
+1478
+270
+1625
+315
+NIL
+global-vote-weighted
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
