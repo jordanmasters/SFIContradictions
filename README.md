@@ -15,19 +15,21 @@
 - Each agent will have an opinion value of ranging from -1 to 1 (uniformly distributed). an opinion of -1 and 1 would be completely contradictory. 0 is assumed to be the "ground truth", and our model concedes that in reality, ground truth may lie somewhere else in the spectrum from -1 to 1.
 
 
-G is the vector of all commulative global opinion polls.  
 
-H (history size) is the number of timesteps (most recent values of G) that agents are allowed to incorporated intot heir own expression of their opinion.
+- C (full consensus) is the vector of all commulative global opinion polls.  
 
-G is initialized with H opinions drawn from a uniform distribution from -1 to 1. This is so that there is a baseline of Global opinions and we can immediately start adding to Global consensus without some other bootstrapping mechanic. 
+- L (history size Percieved Consensus) is the number of timesteps (most recent values of C) that agents are allowed to incorporated intot heir own expression of their opinion.
 
-W is the proportion of weight given to an agents own position.
-W-1 is the weight given to the global position (Global position is avg of the last H elements of G)
+- C is initialized with L opinions drawn from a uniform distribution from -1 to 1. This is so that there is a baseline of Global opinions and we can immediately start adding to Global consensus without some other bootstrapping mechanic. 
 
-PV is the popular vote
+- W (self-weight) is the proportion of weight given to an agents own position.
+- W-1 (global-weight) is the weight given to the global position (Global position is avg of the last L elements of C)
 
-GV is the group vote
+- PV is the popular-vote
 
+- GV is the group-vote (thisis a group level variable)
+
+- G is the global-vote
 
 
 ### Dynamics
@@ -44,14 +46,29 @@ GV is the group vote
 ### Parameters to vary for batch runs
 
 - W
-- H
+- L
 
 ### Outcomes of Interest
 
-- Distance of average of last H positions in G from 0
+- Distance of average of last L positions in C from 0
 - Distance between mean of all voters estimates (popular vote estimate)
  and global estimate (on that round)
 - Other...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
