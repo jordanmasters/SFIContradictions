@@ -115,7 +115,7 @@ end
 to die-birth
   ask turtles with [who > rows * columns]
   [
-    if random-float 1 > prob-die [
+    if random-float 1 > prob-live [
 
       hatch 1 [
         ; dry thid all
@@ -295,9 +295,9 @@ ticks
 
 SLIDER
 14
-373
+438
 115
-406
+471
 rows
 rows
 1
@@ -310,9 +310,9 @@ HORIZONTAL
 
 SLIDER
 119
-373
+438
 237
-406
+471
 columns
 columns
 1
@@ -426,10 +426,10 @@ NIL
 1
 
 SLIDER
-15
-418
-193
-451
+2129
+522
+2307
+555
 percent-acephalous
 percent-acephalous
 0
@@ -458,10 +458,10 @@ NIL
 1
 
 SLIDER
-15
-458
-136
-491
+14
+481
+135
+514
 group-count
 group-count
 1
@@ -473,10 +473,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-142
-458
-263
-491
+141
+481
+262
+514
 group-radius
 group-radius
 0.5
@@ -563,45 +563,45 @@ p q r - Joint Force maxed to 1
 1
 
 SLIDER
-13
-217
-225
-250
+18
+332
+230
+365
 percieved-consensus-len
 percieved-consensus-len
 1
 20
-2.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-12
-265
-184
-298
+17
+247
+189
+280
 self-weight
 self-weight
-0.01
+0.00
 1
-0.11
+0.75
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-15
-322
-187
-355
-prob-die
-prob-die
+18
+291
+190
+324
+prob-live
+prob-live
 0
 1
-0.87
+0.95
 0.01
 1
 NIL
@@ -722,6 +722,26 @@ abs global-vote-weighted - popular-vote
 2
 1
 20
+
+TEXTBOX
+22
+207
+225
+237
+Agent Settings
+24
+0.0
+1
+
+TEXTBOX
+16
+393
+261
+424
+Group Settings
+24
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1069,6 +1089,28 @@ NetLogo 6.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="30" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="100"/>
+    <metric>abs global-vote-weighted - popular-vote</metric>
+    <enumeratedValueSet variable="self-weight">
+      <value value="0"/>
+      <value value="0.25"/>
+      <value value="0.5"/>
+      <value value="0.75"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="percieved-consensus-len">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="5"/>
+      <value value="10"/>
+      <value value="20"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
