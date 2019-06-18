@@ -30,7 +30,7 @@ to setup
   set consensus []
   set consensus-weighted []
   set groups-positions-weighted []
-  set global-vote-weighted []
+  ;set global-vote-weighted []
   let p-len range percieved-consensus-len
   foreach p-len
   [ fake-consent -> set consensus fput (random-float 2 - 1) consensus;show (word x " -> " round x)
@@ -76,8 +76,8 @@ to calc-group-vote
   [ group-num -> set groups-positions ([my-position] of turtles with [mygroup = group-num]) ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
     ;sum [my-position] of turtles with [mygroup = group-num]
   ]
-  show "group pos"
-  show groups-positions
+  ;show "group pos"
+  ;show groups-positions
 ;  set groups-positions map [ ? / 100 ] groups-positions
 
   set groups-positions-weighted []
@@ -96,8 +96,8 @@ to calc-group-vote
     show (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)
     set groups-positions-weighted fput ((mypos * self-weight) + (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)) groups-positions-weighted
   ]
-  show "group pos weighted"
-  show groups-positions-weighted
+  ;show "group pos weighted"
+  ;show groups-positions-weighted
 
   set global-vote sum groups-positions / m
   set consensus fput global-vote consensus
@@ -569,10 +569,10 @@ SLIDER
 250
 percieved-consensus-len
 percieved-consensus-len
-5
-30
-5.0
-5
+1
+20
+2.0
+1
 1
 NIL
 HORIZONTAL
@@ -586,7 +586,7 @@ self-weight
 self-weight
 0.01
 1
-0.97
+0.11
 0.01
 1
 NIL
@@ -601,17 +601,17 @@ prob-die
 prob-die
 0
 1
-0.96
+0.87
 0.01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1021
-50
-1221
-200
+1015
+34
+1215
+184
 Popular Vote
 NIL
 NIL
@@ -626,21 +626,21 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot popular-vote"
 
 MONITOR
-1236
-51
-1331
-96
+1227
+34
+1386
+115
 NIL
 popular-vote
-17
+2
 1
-11
+20
 
 PLOT
-1026
-256
-1226
-406
+1966
+265
+2166
+415
 Global Vote
 NIL
 NIL
@@ -655,10 +655,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot global-vote"
 
 PLOT
-1028
-437
-1228
-587
+1020
+403
+1220
+553
 Global vs Popular Vote Diff
 NIL
 NIL
@@ -670,14 +670,14 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot global-vote - popular-vote"
+"default" 1.0 0 -16777216 true "" "plot abs global-vote-weighted - popular-vote"
 
 PLOT
-1250
-251
-1450
-401
-global-vote-weighted
+1018
+212
+1218
+362
+Global Vote
 NIL
 NIL
 0.0
@@ -691,15 +691,37 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot global-vote-weighted"
 
 MONITOR
-1478
-270
-1625
-315
+1228
+213
+1484
+294
 NIL
 global-vote-weighted
+2
+1
+20
+
+MONITOR
+1966
+426
+2051
+471
+NIL
+global-vote
 17
 1
 11
+
+MONITOR
+1227
+405
+1508
+486
+Global vs Populal Vote Diff
+abs global-vote-weighted - popular-vote
+2
+1
+20
 
 @#$#@#$#@
 ## WHAT IS IT?
