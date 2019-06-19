@@ -10,7 +10,7 @@
 
 extensions [ rnd ]
 
-turtles-own [mygroup my-position vote-prob]
+turtles-own [mygroup my-position vote-prob vote-this-round]
 
 breed [groups group]
 breed [allcs allc]
@@ -44,10 +44,7 @@ to setup
 end
 
 to go
-  ; draw-voters
-  ; calc-popular-vote ;(single)
-  ; calc-group-votes ;(vector)
-  ; calc-global-vote ;(single)
+  draw-voters
   calc-group-vote
   calc-popular-vote
   die-birth
@@ -57,27 +54,58 @@ end
 
 
 
-;to draw-votere
-;  ; for all turtles with who greater than m (the number of groups - bs group count take up first m who values)
-;  1 / sqrt n
-;end
+to draw-voters
+  ; for all turtles with who greater than m (the number of groups - bs group count take up first m who values)
+  ;ask turtles with [who > rows * columns]
+  ;1 / sqrt n
+
+
+  ; each round reinit all agents vote-this-round to true
+  ask turtles with [who >= rows * columns] [
+    set vote-this-round True
+  ]
+
+  ; then select new voters if applicatble
+  if not mandatory-voting? [
+    ask turtles [
+      if vote-prob < random-float 1 [
+        set vote-this-round False
+      ]
+
+    ]
+  ]
+end
 
 to calc-popular-vote
   set popular-vote (sum [my-position] of turtles) / (count turtles - (rows * columns))
 end
 
 to calc-group-vote
+
+
+
   set groups-positions []
   let m rows * columns
   let m-list range m
   let con-len length consensus
   let con-len-back length consensus - percieved-consensus-len
+
+;  show "loop!"
+;  foreach m-list
+;  [ group-num -> show turtles with [mygroup = group-num and vote-this-round = True]
+;    ;set groups-positions ([my-position] of turtles with [mygroup = group-num]) ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
+;
+;    ;sum [my-position] of turtles with [mygroup = group-num]
+;  ]
+
+
   foreach m-list
-  [ group-num -> set groups-positions ([my-position] of turtles with [mygroup = group-num]) ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
+  [ group-num -> set groups-positions ([my-position] of turtles with [mygroup = group-num and vote-this-round = True]) ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
+
     ;sum [my-position] of turtles with [mygroup = group-num]
   ]
-  ;show "group pos"
-  ;show groups-positions
+;  show "group pos"
+;  show groups-positions
 ;  set groups-positions map [ ? / 100 ] groups-positions
 
   set groups-positions-weighted []
@@ -92,12 +120,12 @@ to calc-group-vote
 ;    show mypos * self-weight
 ;    show "sum sublist consensus con-len-back con-len"
 ;    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back))
-;    show "globalpos * 1 - self-weight"
-    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)
+;;    show "globalpos * 1 - self-weight"
+;    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)
     set groups-positions-weighted fput ((mypos * self-weight) + (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)) groups-positions-weighted
   ]
-  ;show "group pos weighted"
-  ;show groups-positions-weighted
+;  show "group pos weighted"
+;  show groups-positions-weighted
 
   set global-vote sum groups-positions / m
   set consensus fput global-vote consensus
@@ -294,10 +322,10 @@ ticks
 30.0
 
 SLIDER
-14
-438
-115
-471
+13
+325
+114
+358
 rows
 rows
 1
@@ -309,10 +337,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-119
-438
-237
-471
+118
+325
+236
+358
 columns
 columns
 1
@@ -325,9 +353,9 @@ HORIZONTAL
 
 BUTTON
 18
-134
+17
 84
-167
+50
 NIL
 setup
 NIL
@@ -342,9 +370,9 @@ NIL
 
 BUTTON
 161
-84
+18
 224
-117
+51
 NIL
 go
 T
@@ -359,9 +387,9 @@ NIL
 
 BUTTON
 227
-84
+18
 308
-117
+51
 go once
 go
 NIL
@@ -458,10 +486,10 @@ NIL
 1
 
 SLIDER
-14
-481
-135
-514
+13
+368
+134
+401
 group-count
 group-count
 1
@@ -473,10 +501,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-141
-481
-262
-514
+140
+368
+261
+401
 group-radius
 group-radius
 0.5
@@ -486,16 +514,6 @@ group-radius
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-21
-85
-171
-119
-Fast Setup
-24
-0.0
-1
 
 TEXTBOX
 1935
@@ -563,40 +581,40 @@ p q r - Joint Force maxed to 1
 1
 
 SLIDER
-18
-332
-230
-365
+17
+206
+229
+239
 percieved-consensus-len
 percieved-consensus-len
 1
 20
-10.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-17
-247
-189
-280
+16
+121
+188
+154
 self-weight
 self-weight
 0.00
 1
-0.75
+0.24
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-18
-291
-190
-324
+17
+165
+189
+198
 prob-live
 prob-live
 0
@@ -630,17 +648,17 @@ MONITOR
 34
 1386
 115
-NIL
+Popular Vote
 popular-vote
 2
 1
 20
 
 PLOT
-1966
-265
-2166
-415
+1634
+205
+1834
+355
 Global Vote
 NIL
 NIL
@@ -695,17 +713,17 @@ MONITOR
 213
 1484
 294
-NIL
+Global Position
 global-vote-weighted
 2
 1
 20
 
 MONITOR
-1966
-426
-2051
-471
+1634
+366
+1719
+411
 NIL
 global-vote
 17
@@ -724,22 +742,65 @@ abs global-vote-weighted - popular-vote
 20
 
 TEXTBOX
-22
-207
-225
-237
+21
+81
+224
+111
 Agent Settings
 24
 0.0
 1
 
 TEXTBOX
-16
-393
-261
-424
+15
+280
+260
+311
 Group Settings
 24
+0.0
+1
+
+SWITCH
+15
+453
+190
+486
+mandatory-voting?
+mandatory-voting?
+0
+1
+-1000
+
+MONITOR
+1231
+596
+1355
+641
+Voters this Round
+count turtles with [vote-this-round = true]
+17
+1
+11
+
+MONITOR
+1121
+595
+1213
+640
+Total Turtles
+count turtles - (rows * columns)
+17
+1
+11
+
+TEXTBOX
+17
+495
+167
+537
+If mandatory voting off - agent vote prob is 1/sqrt(group-count)\n
+11
 0.0
 1
 
