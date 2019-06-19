@@ -659,7 +659,7 @@ PLOT
 205
 1834
 355
-Global Vote
+Global Vote_1
 NIL
 NIL
 0.0
@@ -695,7 +695,7 @@ PLOT
 212
 1218
 362
-Global Vote
+Global Vote_1
 NIL
 NIL
 0.0
@@ -1146,7 +1146,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.2
+NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -1170,6 +1170,29 @@ NetLogo 6.0.2
       <value value="10"/>
       <value value="20"/>
     </enumeratedValueSet>
+  </experiment>
+  <experiment name="amount-of-information" repetitions="30" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="100"/>
+    <metric>abs global-vote-weighted - popular-vote</metric>
+    <enumeratedValueSet variable="mandatory-voting?">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rows">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="columns" first="1" step="5" last="20"/>
+    <steppedValueSet variable="group-count" first="1" step="5" last="20"/>
+    <enumeratedValueSet variable="self-weight">
+      <value value="0.5"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob-live">
+      <value value="0.95"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="percieved-consensus-len" first="1" step="5" last="20"/>
   </experiment>
 </experiments>
 @#$#@#$#@
