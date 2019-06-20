@@ -2,108 +2,59 @@
 
 ## Prompt: Contradictory accounts of an event flow across a group of people.
 
-## The plan:
+## Methods:
+
+Netlogo was utilized to build and run grid search (Behavior Space) over the model. Python was used for data analysis. An outline of the model is presented below.
 
 ### Parts
 
-- Agents
-- Groups made up of n agents
-- There can be m groups
+- World: a discrete square grid, boundaries (periodic or not) and world size are unimportant. 
+
+- Groups: Groups are invisible stationary agents and are placed relative to world size.
+
+- Agent: Agents are also stationary, and are assigned membership to a group. 
 
 ### Init
 
-- Each agent will have an opinion value of ranging from -1 to 1 (uniformly distributed). an opinion of -1 and 1 would be completely contradictory. 0 is assumed to be the "ground truth", and our model concedes that in reality, ground truth may lie somewhere else in the spectrum from -1 to 1.
+- World is created with size (L x L)
 
+- M group agents are created (rows * columns) and placed in square grid relative to size of the world. Their main function is to position groups in space for easy viewing.
 
+- N agents are added in a circle around each invisible group agent. Agents are assigned a random float value (my-position) from [-1,1], from a uniform distribution.  
 
-- C (full consensus) is the vector of all commulative global opinion polls.  
+- C (Consensus) is initially initialized as an empty list - it will become a vector of global positions observed at each time step.
 
-- L (history size Percieved Consensus) is the number of timesteps (most recent values of C) that agents are allowed to incorporated intot heir own expression of their opinion.
+- PC (Percieved Concensus) is the window size of most recent global position observations in C that agents are allowed to see. This value is used to re-initialize (bootstrap) C with PC random float value observations drawn from [-1,1], from a uniform distribution.
 
-- C is initialized with L opinions drawn from a uniform distribution from -1 to 1. This is so that there is a baseline of Global opinions and we can immediately start adding to Global consensus without some other bootstrapping mechanic. 
+- SW (Self Weight) is a value from [0,1] that represents the weight agents give to their own position when broadcasting their vote. (1 - SW) is the weight given to the global position.
 
-- W (self-weight) is the proportion of weight given to an agents own position.
-- W-1 (global-weight) is the weight given to the global position (Global position is avg of the last L elements of C)
+- PL (Probability to live) is the probability that each agent will continue to live on each tick.
 
-- PV is the popular-vote
+- PV (Probability to vote) is the probability that each agent will broadcast their vote on the current round. This is set to 1/sqrt(N)
 
-- GV is the group-vote (thisis a group level variable)
-
-- G is the global-vote
-
-
+- mandatory-voting: If on, all agents vote each round. If off, agents vote with PV
+ 
 ### Dynamics
 
-#### Each round
-- Each agent has a 1/n probability of dying, if they do another will replace it from the same uniform distribution. This assumes an infinite population drawn from a uniform distribution. 
-- Each agent has a 1/sqrt(n) of voting
-- Voting agents use W and W-1 to calculate their expressed position. 
-- Each group position is the average of its group members expressed positions.
-- The new/next global position to be appended to G is calculated by average of group positions.
-- If a group doesn't vote (has no voting members) Either vote as last round or abstain.
+Each round (tick):
 
+- Draw voters: Decide which agents will vote this round using PV
 
-### Parameters to vary for batch runs
-
-- W
-- L
+- Calculate votes:
+	- All agents calculate their broadcast position by combining their position with the last PC values of C as follows.
+		- (my-position * SW) + (C[-PC:] * (1-SW)) -------- [-PC:] is python notation...
+	- All groups calculate their position by taking the average of all voting agent position from their given group.
+	- Global position is calculated by taking the average of all group positions. This value is appended to C
+	- Popular vote is calculated by taking the average of all voting agents in the system.
 
 ### Outcomes of Interest
 
-- Distance of average of last L positions in C from 0
-- Distance between mean of all voters estimates (popular vote estimate)
- and global estimate (on that round)
-- Other...
+- Distance between popular vote and the global consensus.
 
+### Parameters to vary for batch runs
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Orig (old)
-
-Opinions (real value between -1 and 1, uniformly distributed)
-Groups
-
-
-initialization
-
-Agents are born (and take on opinions)
-Pull however many fake g’s we need from uniform [-1,1]
-
-
-dynamics
-
-Each agent has a probability 1/n group members of dying
-Each agent has a probability 1/sqrt(n group members) of voting
-On each timestep, voters take a weighted average of global estimate and own opinions and cast judgment
-Group judgment: Mean of voters judgments
-World judgment: Historical mean of group judgments over t time steps
-If a group doesn’t vote, either
-Vote what they did on the last round
-Abstain
-Parameters to vary: weight on own opinion vs. global estimate; t time steps including in running average
-
-
-outcomes
-
-Measures of distortion:
-Distance of global estimate (on that round) and 0
-Distance between average w/in groups w/o incorporating global estimate (uninformed judgments) and incorporating global estimate (informed judgments)
-Distance between mean of all voters estimates (popular vote estimate)
-and global estimate (on that round)
+- SW
+- PC
+- M
+- N
+- mandatory-voting
