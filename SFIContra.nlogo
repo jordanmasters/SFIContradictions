@@ -100,8 +100,9 @@ to calc-group-vote
 
 
   foreach m-list
-  [ group-num -> set groups-positions ([my-position] of turtles with [mygroup = group-num and vote-this-round = True]) ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
-
+  [ group-num -> set groups-positions fput (sum ([my-position] of turtles with [mygroup = group-num and vote-this-round = True]) / group-count) groups-positions ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
+;    show "debug"
+;    show groups-positions
     ;sum [my-position] of turtles with [mygroup = group-num]
   ]
 ;  show "group pos"
@@ -122,11 +123,11 @@ to calc-group-vote
 ;    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back))
 ;;    show "globalpos * 1 - self-weight"
 ;    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)
-    set groups-positions-weighted fput ((mypos * self-weight) + (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)) groups-positions-weighted
+    set groups-positions-weighted fput ((mypos * self-weight) + ((sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight))) groups-positions-weighted
   ]
 ;  show "group pos weighted"
 ;  show groups-positions-weighted
-
+;  show 1 - self-weight
   set global-vote sum groups-positions / m
   set consensus fput global-vote consensus
 
@@ -330,7 +331,7 @@ rows
 rows
 1
 10
-4.0
+2.0
 1
 1
 NIL
@@ -345,7 +346,7 @@ columns
 columns
 1
 10
-4.0
+1.0
 1
 1
 NIL
@@ -494,7 +495,7 @@ group-count
 group-count
 1
 30
-12.0
+4.0
 1
 1
 NIL
@@ -604,7 +605,7 @@ self-weight
 self-weight
 0.00
 1
-0.24
+1.0
 0.01
 1
 NIL
@@ -619,7 +620,7 @@ prob-live
 prob-live
 0
 1
-0.95
+0.98
 0.01
 1
 NIL
@@ -736,7 +737,7 @@ MONITOR
 1508
 486
 Global vs Populal Vote Diff
-abs global-vote-weighted - popular-vote
+abs (global-vote-weighted - popular-vote)
 2
 1
 20
@@ -1146,7 +1147,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.0
+NetLogo 6.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
