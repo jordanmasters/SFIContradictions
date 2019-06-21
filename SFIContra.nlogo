@@ -100,8 +100,12 @@ to calc-group-vote
 
 
   foreach m-list
-  [ group-num -> set groups-positions fput (sum ([my-position] of turtles with [mygroup = group-num and vote-this-round = True]) / group-count) groups-positions ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
-;    show "debug"
+  [ group-num ->
+      if (group-count - (count turtles with [mygroup = group-num and vote-this-round = False])) != 0 [
+
+        set groups-positions fput (sum ([my-position] of turtles with [mygroup = group-num and vote-this-round = True]) / (group-count - (count turtles with [mygroup = group-num and vote-this-round = False]))) groups-positions ;+ sum sublist con-len con-len-back * (1 - se))     ;show (word x " -> " round x)
+      ]                                                                                                                                                                                                                      ;
+     ;show "debug"
 ;    show groups-positions
     ;sum [my-position] of turtles with [mygroup = group-num]
   ]
@@ -125,8 +129,8 @@ to calc-group-vote
 ;    show (sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight)
     set groups-positions-weighted fput ((mypos * self-weight) + ((sum sublist consensus con-len-back con-len / (con-len - con-len-back)) * (1 - self-weight))) groups-positions-weighted
   ]
-;  show "group pos weighted"
-;  show groups-positions-weighted
+  show "group pos weighted"
+  show groups-positions-weighted
 ;  show 1 - self-weight
   set global-vote sum groups-positions / m
   set consensus fput global-vote consensus
@@ -331,7 +335,7 @@ rows
 rows
 1
 10
-2.0
+1.0
 1
 1
 NIL
@@ -495,7 +499,7 @@ group-count
 group-count
 1
 30
-4.0
+20.0
 1
 1
 NIL
@@ -590,7 +594,7 @@ percieved-consensus-len
 percieved-consensus-len
 1
 20
-1.0
+11.0
 1
 1
 NIL
@@ -620,7 +624,7 @@ prob-live
 prob-live
 0
 1
-0.98
+0.95
 0.01
 1
 NIL
@@ -656,10 +660,10 @@ popular-vote
 20
 
 PLOT
-1634
-205
-1834
-355
+1636
+206
+1836
+356
 Global Vote_1
 NIL
 NIL
@@ -721,10 +725,10 @@ global-vote-weighted
 20
 
 MONITOR
-1634
-366
-1719
-411
+1636
+367
+1721
+412
 NIL
 global-vote
 17
